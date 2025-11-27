@@ -5,9 +5,6 @@ const API_URL = '/api';
 let monitoredAirports = [];
 let currentAirport = null;
 let notificationsEnabled = true;
-let monitoredAirports = [];
-let currentAirport = null;
-let notificationsEnabled = true;
 let currentFlightType = 'departures'; // NEW: Track current tab
 let allFlightsCache = { departures: [], arrivals: [] }; // NEW: Cache both types
 
