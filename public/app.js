@@ -83,8 +83,9 @@ function setupEventListeners() {
   });
   
   testNotificationBtn.addEventListener('click', testNotification);
-  
-  // Setup tab switching
+}
+
+// Setup tab switching
 function setupFlightTabs() {
     const tabButtons = document.querySelectorAll('.flight-tab');
     
@@ -107,13 +108,12 @@ function setupFlightTabs() {
     });
 }
 
-  // Load notification preference
+// Load notification preference
   const savedPref = localStorage.getItem('notificationsEnabled');
   if (savedPref !== null) {
     notificationsEnabled = savedPref === 'true';
     notificationsCheckbox.checked = notificationsEnabled;
   }
-}
 
 // Display popular airports
 function displayPopularAirports() {
