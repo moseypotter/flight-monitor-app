@@ -52,8 +52,118 @@ async function init() {
   setupEventListeners();
   
   // Setup flight tabs
-  setupFlightTabs(); // NEW LINE
+  setupFlightTabs(); 
+
+  // Setup phone number
+  setupPhoneNumber();
   
+  // Setup phone number management
+function setupPhoneNumber() {
+    const phoneInput = document.getElementById('phoneNumberInput');
+    const savePhoneBtn = document.getElementById('savePhoneBtn');
+    const testSMSBtn = document.getElementById('testSMSBtn');
+    const phoneStatus = document.getElementById('phoneStatus');
+    
+    // Load saved phone number
+    const savedPhone = localStorage.getItem('userPhoneNumber');
+    if (savedPhone) {
+        phoneInput.value = savedPhone;
+        testSMSBtn.disabled = false;
+        showPhoneStatus('✅ Phone number saved', 'success');
+    }
+    
+    // Save phone number
+    savePhoneBtn.addEventListener('click', async () => {
+        const phoneNumber = phoneInput.value.trim();
+        
+        if (!phoneNumber) {
+            showPhoneStatus('❌ Please enter a phone number', 'error');
+            return;
+        }
+        
+        // Validate phone format (basic)
+        const phoneRegex = /^\+?[\d\s\-\(\)]+$/;
+        if (!phoneRegex.test(phoneNumber)) {
+            showPhoneStatus('❌ Please enter a valid phone number (e.g., +1 555 123 4567)', 'error');
+            return;
+        }
+        
+        try {
+            savePhoneBtn.disabled = true;
+            savePhoneBtn.textContent = 'Saving...';
+            
+            const response = await fetch(`${API_URL}/user/phone`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phoneNumber })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                localStorage.setItem('userPhoneNumber', phoneNumber);
+                testSMSBtn.disabled = false;
+                showPhoneStatus('✅ Phone number saved! You\'ll receive SMS alerts for delays.', 'success');
+            } else {
+                showPhoneStatus('❌ Failed to save: ' + data.error, 'error');
+            }
+        } catch (error) {
+            console.error('Error saving phone:', error);
+            showPhoneStatus('❌ Error saving phone number. Please try again.', 'error');
+        } finally {
+            savePhoneBtn.disabled = false;
+            savePhoneBtn.textContent = 'Save Phone Number';
+        }
+    });
+    
+    // Test SMS
+    testSMSBtn.addEventListener('click', async () => {
+        const phoneNumber = phoneInput.value.trim();
+        
+        if (!phoneNumber) {
+            showPhoneStatus('❌ Please save your phone number first', 'error');
+            return;
+        }
+        
+        try {
+            testSMSBtn.disabled = true;
+            testSMSBtn.textContent = 'Sending...';
+            
+            const response = await fetch(`${API_URL}/user/test-sms`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phoneNumber })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showPhoneStatus('✅ Test SMS sent! Check your phone (may take 1-2 min).', 'success');
+            } else {
+                showPhoneStatus('❌ Failed to send: ' + data.error, 'error');
+            }
+        } catch (error) {
+            console.error('Error sending test SMS:', error);
+            showPhoneStatus('❌ Error sending test SMS. Please try again.', 'error');
+        } finally {
+            testSMSBtn.disabled = false;
+            testSMSBtn.textContent = 'Send Test SMS';
+        }
+    });
+    
+    function showPhoneStatus(message, type) {
+        phoneStatus.textContent = message;
+        phoneStatus.className = `phone-status ${type}`;
+        phoneStatus.style.display = 'block';
+        
+        if (type === 'success') {
+            setTimeout(() => {
+                phoneStatus.style.display = 'none';
+            }, 8000);
+        }
+    }
+}
+
   // Auto-refresh every 5 minutes
   setInterval(() => {
     if (currentAirport) {

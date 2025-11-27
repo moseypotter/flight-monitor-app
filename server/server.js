@@ -7,6 +7,7 @@ const flightService = require('./flightService');
 const notificationService = require('./notificationService');
 const database = require('./database');
 const analyticsService = require('./analyticsService');
+const smsService = require('./smsService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,6 +16,9 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
+
+// Initialize Twilio
+smsService.initializeTwilio();
 
 // Store active monitoring airports
 let monitoredAirports = [];
@@ -73,6 +77,51 @@ app.post('/api/monitor/add', (req, res) => {
   }
 });
 
+// Save user phone number for SMS notifications
+app.post('/api/user/phone', (req, res) => {
+  try {
+    const { phoneNumber } = req.body;
+    
+    if (!phoneNumber) {
+      return res.status(400).json({ success: false, error: 'Phone number required' });
+    }
+    
+    // Basic phone validation
+    const cleanPhone = phoneNumber.replace(/\D/g, '');
+    if (cleanPhone.length < 10) {
+      return res.status(400).json({ success: false, error: 'Invalid phone number format' });
+    }
+    
+    database.saveUserPhone(phoneNumber);
+    
+    res.json({ success: true, message: 'Phone number saved successfully' });
+  } catch (error) {
+    console.error('Error saving phone:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Send test SMS
+app.post('/api/user/test-sms', async (req, res) => {
+  try {
+    const { phoneNumber } = req.body;
+    
+    if (!phoneNumber) {
+      return res.status(400).json({ success: false, error: 'Phone number required' });
+    }
+    
+    const result = await smsService.sendSMS(
+      phoneNumber, 
+      '✈️ Test from Flight Monitor! You\'ll receive delay alerts at this number.'
+    );
+    
+    res.json(result);
+  } catch (error) {
+    console.error('Error sending test SMS:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Remove airport from monitoring list
 app.post('/api/monitor/remove', (req, res) => {
   try {
@@ -104,6 +153,7 @@ app.get('/api/analytics', (req, res) => {
   }
 });
 
+
 // Background job to check for flight delays
 const checkInterval = process.env.CHECK_INTERVAL_MINUTES || 15;
 cron.schedule(`*/${checkInterval} * * * *`, async () => {
@@ -124,11 +174,30 @@ cron.schedule(`*/${checkInterval} * * * *`, async () => {
       
       if (delayedFlights.length > 0) {
         console.log(`Found ${delayedFlights.length} delayed flight(s) at ${airport.code}`);
-        // In a real app, you'd send these to connected clients via WebSocket
-        // For now, we just log them
-        delayedFlights.forEach(flight => {
-          console.log(`  - Flight ${flight.flight.iata}: ${flight.delayMinutes} min delay`);
+        
+        // Get all registered phone numbers
+        const userPhones = database.getAllUserPhones();
+        const phoneNumbers = userPhones.map(p => p.number);
+        
+        // Log each delayed flight
+        delayedFlights.forEach(delayedFlight => {
+          console.log(`  - Flight ${delayedFlight.flight.flightNumber}: ${delayedFlight.delayMinutes} min delay`);
         });
+        
+        // Send SMS to all registered users
+        if (phoneNumbers.length > 0) {
+          console.log(`📱 Sending SMS to ${phoneNumbers.length} user(s)...`);
+          
+          for (const delayedFlight of delayedFlights) {
+            await smsService.sendDelayNotificationToAll(
+              delayedFlight.flight,
+              delayedFlight.delayMinutes,
+              phoneNumbers
+            );
+          }
+        } else {
+          console.log('No phone numbers registered for SMS notifications.');
+        }
       }
       
       // Save flight data
@@ -141,6 +210,7 @@ cron.schedule(`*/${checkInterval} * * * *`, async () => {
   
   console.log('Scheduled check completed.\n');
 });
+
 
 // Load saved monitored airports on startup
 monitoredAirports = database.loadMonitoredAirports();

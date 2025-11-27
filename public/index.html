@@ -68,24 +68,51 @@
     </div>
 </section>
 
-        <!-- Notification Settings -->
-        <section class="settings-section">
-            <h2>⚙️ Settings</h2>
-            <div class="settings-box">
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" id="notificationsEnabled" checked>
-                        Enable browser notifications for delays
-                    </label>
-                </div>
-                <button id="testNotificationBtn" class="btn-secondary">Test Notification</button>
-                <p class="setting-note">
-                    ℹ️ Notifications will appear when flights are delayed by 15+ minutes
-                </p>
+<!-- Notification Settings -->
+<section class="settings-section">
+    <h2>⚙️ Notification Settings</h2>
+    <div class="settings-box">
+        <!-- Browser Notifications -->
+        <div class="setting-group">
+            <h3>🔔 Browser Notifications</h3>
+            <div class="setting-item">
+                <label>
+                    <input type="checkbox" id="notificationsEnabled" checked>
+                    Enable browser notifications for delays
+                </label>
             </div>
-        </section>
+            <button type="button" id="testNotificationBtn" class="btn-secondary">Test Browser Notification</button>
+        </div>
 
-        <!-- Status Bar -->
+        <!-- SMS Notifications -->
+        <div class="setting-group">
+            <h3>📱 SMS Text Notifications</h3>
+            <p class="setting-description">Get text messages when flights are delayed 15+ minutes</p>
+            
+            <div class="phone-input-group">
+                <input 
+                    type="tel" 
+                    id="phoneNumberInput" 
+                    placeholder="+1 (555) 123-4567" 
+                    class="phone-input"
+                >
+                <button type="button" id="savePhoneBtn" class="btn-primary">Save Phone Number</button>
+            </div>
+            
+            <div id="phoneStatus" class="phone-status" style="display: none;"></div>
+            
+            <button type="button" id="testSMSBtn" class="btn-secondary" style="margin-top: 10px;" disabled>
+                Send Test SMS
+            </button>
+        </div>
+
+        <p class="setting-note">
+            ℹ️ Notifications will appear when flights are delayed by 15+ minutes
+        </p>
+    </div>
+</section>
+
+<!-- Status Bar -->
         <div id="statusBar" class="status-bar">
             <span id="statusText">Ready</span>
             <span id="lastUpdate"></span>

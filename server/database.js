@@ -127,6 +127,38 @@ function loadDelayTrends() {
 // Initialize on module load
 loadData();
 
+// User phone numbers management
+function saveUserPhone(phoneNumber) {
+  if (!dataStore.userPhones) {
+    dataStore.userPhones = [];
+  }
+  
+  // Check if phone already exists
+  const exists = dataStore.userPhones.find(p => p.number === phoneNumber);
+  if (!exists) {
+    dataStore.userPhones.push({
+      number: phoneNumber,
+      addedAt: new Date().toISOString()
+    });
+    saveData();
+    console.log(`📱 New phone registered: ${phoneNumber}`);
+  }
+  
+  return true;
+}
+
+function getAllUserPhones() {
+  return dataStore.userPhones || [];
+}
+
+function removeUserPhone(phoneNumber) {
+  if (!dataStore.userPhones) return;
+  
+  dataStore.userPhones = dataStore.userPhones.filter(p => p.number !== phoneNumber);
+  saveData();
+  console.log(`📱 Phone removed: ${phoneNumber}`);
+}
+
 module.exports = {
   saveMonitoredAirports,
   loadMonitoredAirports,
@@ -134,5 +166,8 @@ module.exports = {
   loadPreviousFlights,
   saveFlightData,
   loadAllFlightRecords,
-  loadDelayTrends
+  loadDelayTrends,
+  saveUserPhone,
+  getAllUserPhones,
+  removeUserPhone
 };
