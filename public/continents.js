@@ -9,6 +9,7 @@ const airportContinents = {
   'IAH': 'North America', 'BOS': 'North America', 'MSP': 'North America',
   'DTW': 'North America', 'PHL': 'North America', 'LGA': 'North America',
   'EWR': 'North America', 'CLT': 'North America', 'SAN': 'North America',
+  'YOW': 'North America',
   
   // Europe
   'LHR': 'Europe', 'CDG': 'Europe', 'AMS': 'Europe', 'FRA': 'Europe',
