@@ -15,19 +15,13 @@ const POPULAR_AIRPORTS = [
   { code: 'CDG', name: 'Charles de Gaulle Airport', city: 'Paris' },
 ];
 
-async function getFlights(airportCode) {
+async function getFlights(airportCode, type = 'departures') {
   try {
     if (!API_KEY || API_KEY === 'your_api_key_here') {
       throw new Error('Please set your FLIGHT_API_KEY in the .env file');
     }
 
-    async function getFlights(airportCode, type = 'departures') {
-  try {
-    if (!API_KEY || API_KEY === 'your_api_key_here') {
-      throw new Error('Please set your FLIGHT_API_KEY in the .env file');
-    }
-
-    // Set parameter based on type
+    // Set parameter based on type (departures or arrivals)
     const params = {
       access_key: API_KEY,
       limit: 20
@@ -35,13 +29,12 @@ async function getFlights(airportCode) {
     
     if (type === 'departures') {
       params.dep_iata = airportCode;
-    } else {
+    } else if (type === 'arrivals') {
       params.arr_iata = airportCode;
     }
 
     const response = await axios.get(`${BASE_URL}/flights`, { params });
 
-    
     if (!response.data || !response.data.data) {
       throw new Error('Invalid API response');
     }
@@ -51,7 +44,7 @@ async function getFlights(airportCode) {
       airline: flight.airline?.name || 'Unknown',
       departure: {
         airport: flight.departure?.airport || 'Unknown',
-        iata: flight.departure?.iata || airportCode,
+        iata: flight.departure?.iata || 'N/A',
         scheduledTime: flight.departure?.scheduled || null,
         estimatedTime: flight.departure?.estimated || null,
         actualTime: flight.departure?.actual || null,
