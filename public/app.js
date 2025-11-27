@@ -254,78 +254,82 @@ async function loadFlights(airportCode) {
 let currentContinentFilter = 'all';
 let allFlightsData = [];
 
-// Display flights with continent filtering
+
+// Display flights grouped by continent
 function displayFlights(flights) {
-  allFlightsData = flights; // Store all flights
-  
-  // Get unique continents from flights
-  const continents = new Set(flights.map(f => getContinent(f.arrival.iata)));
-  
-  // Update filter buttons
-  const filtersHtml = `
-    <button class="continent-filter-btn ${currentContinentFilter === 'all' ? 'active' : ''}" 
-            onclick="filterByContinent('all')">All (${flights.length})</button>
-    ${Array.from(continents).sort().map(continent => {
-      const count = flights.filter(f => getContinent(f.arrival.iata) === continent).length;
-      return `
-        <button class="continent-filter-btn ${currentContinentFilter === continent ? 'active' : ''}" 
-                onclick="filterByContinent('${continent}')">${continent} (${count})</button>
-      `;
-    }).join('')}
-  `;
-  document.getElementById('continentFilters').innerHTML = filtersHtml;
-  
-  // Filter flights
-  const filteredFlights = currentContinentFilter === 'all' 
-    ? flights 
-    : flights.filter(f => getContinent(f.arrival.iata) === currentContinentFilter);
-  
-  if (filteredFlights.length === 0) {
-    flightsContainer.innerHTML = '<p class="empty-state">No flights found for this filter</p>';
+  if (flights.length === 0) {
+    flightsContainer.innerHTML = '<p class="empty-state">No flights found</p>';
     return;
   }
   
-  flightsContainer.innerHTML = filteredFlights.map(flight => {
-    const isDelayed = flight.departure.delay > 0;
-    const statusClass = flight.status.toLowerCase().replace(' ', '-');
+  // Group flights by continent
+  const flightsByContinent = {};
+  
+  flights.forEach(flight => {
     const continent = getContinent(flight.arrival.iata);
+    if (!flightsByContinent[continent]) {
+      flightsByContinent[continent] = [];
+    }
+    flightsByContinent[continent].push(flight);
+  });
+  
+  // Sort continents alphabetically
+  const sortedContinents = Object.keys(flightsByContinent).sort();
+  
+  // Build HTML with continent sections
+  const html = sortedContinents.map(continent => {
+    const continentFlights = flightsByContinent[continent];
     const continentColor = getContinentColor(continent);
     
     return `
-      <div class="flight-card ${isDelayed ? 'delayed' : ''}">
-        <div style="min-width: 120px;">
-          <div class="flight-number">${flight.flightNumber}</div>
-          <div class="flight-airline">${flight.airline}</div>
+      <div class="continent-section">
+        <div class="continent-header" style="background: ${continentColor};">
+          <h3>${continent}</h3>
+          <span class="continent-count">${continentFlights.length} flight${continentFlights.length !== 1 ? 's' : ''}</span>
         </div>
-        
-        <div class="flight-route">
-          <div class="flight-location">
-            <div class="airport-code-large">${flight.departure.iata}</div>
-            <div class="flight-time">${formatTime(flight.departure.scheduledTime)}</div>
-          </div>
-          
-          <div class="flight-arrow">→</div>
-          
-          <div class="flight-location">
-            <div class="airport-code-large">${flight.arrival.iata}</div>
-            <div class="flight-time">${formatTime(flight.arrival.scheduledTime)}</div>
-            <span class="continent-badge" style="background: ${continentColor}; margin-top: 5px;">
-              ${continent}
-            </span>
-          </div>
+        <div class="continent-flights">
+          ${continentFlights.map(flight => {
+            const isDelayed = flight.departure.delay > 0;
+            const statusClass = flight.status.toLowerCase().replace(' ', '-');
+            
+            return `
+              <div class="flight-card ${isDelayed ? 'delayed' : ''}">
+                <div style="min-width: 120px;">
+                  <div class="flight-number">${flight.flightNumber}</div>
+                  <div class="flight-airline">${flight.airline}</div>
+                </div>
+                
+                <div class="flight-route">
+                  <div class="flight-location">
+                    <div class="airport-code-large">${flight.departure.iata}</div>
+                    <div class="flight-time">${formatTime(flight.departure.scheduledTime)}</div>
+                  </div>
+                  
+                  <div class="flight-arrow">→</div>
+                  
+                  <div class="flight-location">
+                    <div class="airport-code-large">${flight.arrival.iata}</div>
+                    <div class="flight-time">${formatTime(flight.arrival.scheduledTime)}</div>
+                  </div>
+                </div>
+                
+                <div class="flight-details-compact">
+                  <span>Gate: ${flight.departure.gate}</span>
+                  <span>Terminal: ${flight.departure.terminal}</span>
+                </div>
+                
+                ${isDelayed ? `<span class="delay-badge">+${flight.departure.delay} min</span>` : ''}
+                
+                <span class="flight-status status-${statusClass}">${flight.status}</span>
+              </div>
+            `;
+          }).join('')}
         </div>
-        
-        <div class="flight-details-compact">
-          <span>Gate: ${flight.departure.gate}</span>
-          <span>Terminal: ${flight.departure.terminal}</span>
-        </div>
-        
-        ${isDelayed ? `<span class="delay-badge">+${flight.departure.delay} min</span>` : ''}
-        
-        <span class="flight-status status-${statusClass}">${flight.status}</span>
       </div>
     `;
   }).join('');
+  
+  flightsContainer.innerHTML = html;
 }
 
 // Filter flights by continent

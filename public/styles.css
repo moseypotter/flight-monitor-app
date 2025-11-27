@@ -435,3 +435,46 @@ button:active {
     color: white;
     display: inline-block;
 }
+
+/* Continent Sections */
+.continent-section {
+    margin-bottom: 30px;
+}
+
+.continent-header {
+    padding: 15px 20px;
+    border-radius: 10px 10px 0 0;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+.continent-header h3 {
+    color: white;
+    margin: 0;
+    font-size: 1.3em;
+}
+
+.continent-count {
+    font-size: 0.9em;
+    opacity: 0.9;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 5px 15px;
+    border-radius: 20px;
+}
+
+.continent-flights {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 0 0 10px 10px;
+}
+
+.continent-flights .flight-card {
+    margin: 0;
+    background: white;
+}
