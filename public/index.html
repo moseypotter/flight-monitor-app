@@ -49,9 +49,14 @@
         <!-- Flight Display -->
         <section class="flights-section">
             <div class="section-header">
-                <h2>Current Flights</h2>
-                <button id="refreshBtn" class="refresh-btn">🔄 Refresh</button>
-            </div>
+    <h2>Current Flights</h2>
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <div class="continent-filters" id="continentFilters">
+            <button class="continent-filter-btn active" data-continent="all">All</button>
+        </div>
+        <button id="refreshBtn" class="refresh-btn">🔄 Refresh</button>
+    </div>
+</div>
             <div id="flightsContainer" class="flights-container">
                 <p class="empty-state">Select an airport to view flights</p>
             </div>
@@ -81,6 +86,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=2"></script>
+    <script src="continents.js"></script>
+<script src="app.js?v=2"></script>
 </body>
 </html>

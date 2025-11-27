@@ -396,3 +396,42 @@ button:active {
         grid-template-columns: 1fr;
     }
 }
+
+/* Continent Filters */
+.continent-filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.continent-filter-btn {
+    padding: 8px 16px;
+    font-size: 0.85em;
+    border-radius: 20px;
+    border: 2px solid #ddd;
+    background: white;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.continent-filter-btn:hover {
+    transform: translateY(0);
+    border-color: #667eea;
+}
+
+.continent-filter-btn.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+/* Continent Badge */
+.continent-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 600;
+    color: white;
+    display: inline-block;
+}

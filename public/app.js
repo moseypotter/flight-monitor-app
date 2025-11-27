@@ -250,11 +250,46 @@ async function loadFlights(airportCode) {
   }
 }
 
-// Display flights
+// Current continent filter
+let currentContinentFilter = 'all';
+let allFlightsData = [];
+
+// Display flights with continent filtering
 function displayFlights(flights) {
-  flightsContainer.innerHTML = flights.map(flight => {
+  allFlightsData = flights; // Store all flights
+  
+  // Get unique continents from flights
+  const continents = new Set(flights.map(f => getContinent(f.arrival.iata)));
+  
+  // Update filter buttons
+  const filtersHtml = `
+    <button class="continent-filter-btn ${currentContinentFilter === 'all' ? 'active' : ''}" 
+            onclick="filterByContinent('all')">All (${flights.length})</button>
+    ${Array.from(continents).sort().map(continent => {
+      const count = flights.filter(f => getContinent(f.arrival.iata) === continent).length;
+      return `
+        <button class="continent-filter-btn ${currentContinentFilter === continent ? 'active' : ''}" 
+                onclick="filterByContinent('${continent}')">${continent} (${count})</button>
+      `;
+    }).join('')}
+  `;
+  document.getElementById('continentFilters').innerHTML = filtersHtml;
+  
+  // Filter flights
+  const filteredFlights = currentContinentFilter === 'all' 
+    ? flights 
+    : flights.filter(f => getContinent(f.arrival.iata) === currentContinentFilter);
+  
+  if (filteredFlights.length === 0) {
+    flightsContainer.innerHTML = '<p class="empty-state">No flights found for this filter</p>';
+    return;
+  }
+  
+  flightsContainer.innerHTML = filteredFlights.map(flight => {
     const isDelayed = flight.departure.delay > 0;
     const statusClass = flight.status.toLowerCase().replace(' ', '-');
+    const continent = getContinent(flight.arrival.iata);
+    const continentColor = getContinentColor(continent);
     
     return `
       <div class="flight-card ${isDelayed ? 'delayed' : ''}">
@@ -274,6 +309,9 @@ function displayFlights(flights) {
           <div class="flight-location">
             <div class="airport-code-large">${flight.arrival.iata}</div>
             <div class="flight-time">${formatTime(flight.arrival.scheduledTime)}</div>
+            <span class="continent-badge" style="background: ${continentColor}; margin-top: 5px;">
+              ${continent}
+            </span>
           </div>
         </div>
         
@@ -288,6 +326,12 @@ function displayFlights(flights) {
       </div>
     `;
   }).join('');
+}
+
+// Filter flights by continent
+function filterByContinent(continent) {
+  currentContinentFilter = continent;
+  displayFlights(allFlightsData);
 }
 
 // Check for delays and send notifications
