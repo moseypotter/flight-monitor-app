@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Analytics Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Flight Analytics Dashboard</h1>
+            <p>Real-time insights and delay analytics</p>
+            <div class="header-nav">
+                <a href="index.html" class="nav-link">← Back to Flights</a>
+            </div>
+        </header>
+
+        <!-- Summary Stats -->
+        <section class="stats-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Overview</h2>
+                <div class="time-filters">
+                    <button class="filter-btn active" data-filter="24h">Last 24h</button>
+                    <button class="filter-btn" data-filter="7d">Last 7 Days</button>
+                    <button class="filter-btn" data-filter="30d">Last 30 Days</button>
+                    <button class="filter-btn" data-filter="1y">Last Year</button>
+                    <button class="filter-btn" data-filter="all">All Time</button>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">✈️</div>
+                    <div class="stat-value" id="totalFlights">0</div>
+                    <div class="stat-label">Total Flights Tracked</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⏱️</div>
+                    <div class="stat-value" id="avgDelay">0</div>
+                    <div class="stat-label">Avg Delay (min)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-value" id="onTimePercent">0%</div>
+                    <div class="stat-label">On-Time Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔴</div>
+                    <div class="stat-value" id="delayedCount">0</div>
+                    <div class="stat-label">Delayed Flights</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="charts-section">
+            <div class="chart-row">
+                <div class="chart-container">
+                    <h3>Flight Status Distribution</h3>
+                    <canvas id="statusChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Delays by Airline</h3>
+                    <canvas id="airlineChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-row">
+                <div class="chart-container-wide">
+                    <h3>Delay Trends Over Time</h3>
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-row">
+                <div class="chart-container">
+                    <h3>Busiest Hours</h3>
+                    <canvas id="hourlyChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Top Destinations</h3>
+                    <canvas id="destinationChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Delays Table -->
+        <section class="table-section">
+            <h2>Recent Delays (15+ minutes)</h2>
+            <div id="delaysTable" class="delays-table-container">
+                <p class="empty-state">No delayed flights recorded yet</p>
+            </div>
+        </section>
+
+        <!-- Status Bar -->
+        <div id="statusBar" class="status-bar">
+            <span id="statusText">Loading analytics...</span>
+            <span id="lastUpdate"></span>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

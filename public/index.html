@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Monitor - Real-time Delay Notifications</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✈️ Flight Monitor</h1>
+            <p>Real-time flight delay notifications for your local airport</p>
+            <div style="margin-top: 15px;">
+                <a href="dashboard.html" style="color: white; text-decoration: none; padding: 10px 20px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; display: inline-block;">
+                    📊 View Analytics Dashboard
+                </a>
+            </div>
+        </header>
+
+        <!-- Airport Selection -->
+        <section class="airport-selection">
+            <h2>Select Airport to Monitor</h2>
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="airportSearch" 
+                    placeholder="Search airport by name or code (e.g., YYZ, Toronto)..."
+                >
+                <button id="searchBtn">Search</button>
+            </div>
+            
+            <div id="airportResults" class="airport-results"></div>
+            
+            <div class="popular-airports">
+                <h3>Popular Airports</h3>
+                <div id="popularAirports" class="airport-grid"></div>
+            </div>
+        </section>
+
+        <!-- Monitored Airports -->
+        <section class="monitored-section">
+            <h2>Monitoring</h2>
+            <div id="monitoredAirports" class="monitored-list">
+                <p class="empty-state">No airports being monitored yet. Select an airport above.</p>
+            </div>
+        </section>
+
+        <!-- Flight Display -->
+        <section class="flights-section">
+            <div class="section-header">
+                <h2>Current Flights</h2>
+                <button id="refreshBtn" class="refresh-btn">🔄 Refresh</button>
+            </div>
+            <div id="flightsContainer" class="flights-container">
+                <p class="empty-state">Select an airport to view flights</p>
+            </div>
+        </section>
+
+        <!-- Notification Settings -->
+        <section class="settings-section">
+            <h2>⚙️ Settings</h2>
+            <div class="settings-box">
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="notificationsEnabled" checked>
+                        Enable browser notifications for delays
+                    </label>
+                </div>
+                <button id="testNotificationBtn" class="btn-secondary">Test Notification</button>
+                <p class="setting-note">
+                    ℹ️ Notifications will appear when flights are delayed by 15+ minutes
+                </p>
+            </div>
+        </section>
+
+        <!-- Status Bar -->
+        <div id="statusBar" class="status-bar">
+            <span id="statusText">Ready</span>
+            <span id="lastUpdate"></span>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
