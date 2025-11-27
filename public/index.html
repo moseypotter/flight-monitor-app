@@ -47,20 +47,26 @@
         </section>
 
         <!-- Flight Display -->
-        <section class="flights-section">
-            <div class="section-header">
-    <h2>Current Flights</h2>
-    <div style="display: flex; gap: 10px; align-items: center;">
-        <div class="continent-filters" id="continentFilters">
-            <button class="continent-filter-btn active" data-continent="all">All</button>
-        </div>
+<section class="flights-section">
+    <div class="section-header">
+        <h2>Current Flights</h2>
         <button id="refreshBtn" class="refresh-btn">🔄 Refresh</button>
     </div>
-</div>
-            <div id="flightsContainer" class="flights-container">
-                <p class="empty-state">Select an airport to view flights</p>
-            </div>
-        </section>
+    
+    <!-- Excel-style Tabs -->
+    <div class="flight-tabs">
+        <button class="flight-tab active" data-type="departures">
+            ✈️ Departures
+        </button>
+        <button class="flight-tab" data-type="arrivals">
+            🛬 Arrivals
+        </button>
+    </div>
+    
+    <div id="flightsContainer" class="flights-container">
+        <p class="empty-state">Select an airport to view flights</p>
+    </div>
+</section>
 
         <!-- Notification Settings -->
         <section class="settings-section">

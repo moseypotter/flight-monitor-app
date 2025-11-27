@@ -478,3 +478,42 @@ button:active {
     margin: 0;
     background: white;
 }
+
+/* Excel-style Flight Tabs */
+.flight-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: -1px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.flight-tab {
+    padding: 12px 30px;
+    background: #f8f9fa;
+    color: #6c757d;
+    border: 2px solid #dee2e6;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    bottom: -2px;
+}
+
+.flight-tab:hover {
+    background: #e9ecef;
+    transform: translateY(0);
+}
+
+.flight-tab.active {
+    background: white;
+    color: #667eea;
+    font-weight: 600;
+    border-bottom: 2px solid white;
+    z-index: 1;
+}
+
+.flight-tab:not(.active) {
+    border-bottom: 2px solid #dee2e6;
+}

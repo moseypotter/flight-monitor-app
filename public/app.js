@@ -5,6 +5,12 @@ const API_URL = '/api';
 let monitoredAirports = [];
 let currentAirport = null;
 let notificationsEnabled = true;
+let monitoredAirports = [];
+let currentAirport = null;
+let notificationsEnabled = true;
+let currentFlightType = 'departures'; // NEW: Track current tab
+let allFlightsCache = { departures: [], arrivals: [] }; // NEW: Cache both types
+
 
 // Popular airports (from backend)
 const popularAirports = [
@@ -48,6 +54,9 @@ async function init() {
   // Setup event listeners
   setupEventListeners();
   
+  // Setup flight tabs
+  setupFlightTabs(); // NEW LINE
+  
   // Auto-refresh every 5 minutes
   setInterval(() => {
     if (currentAirport) {
@@ -78,6 +87,29 @@ function setupEventListeners() {
   
   testNotificationBtn.addEventListener('click', testNotification);
   
+  // Setup tab switching
+function setupFlightTabs() {
+    const tabButtons = document.querySelectorAll('.flight-tab');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Remove active class from all tabs
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked tab
+            button.classList.add('active');
+            
+            // Update current flight type
+            currentFlightType = button.dataset.type;
+            
+            // Reload flights with new type
+            if (currentAirport) {
+                loadFlights(currentAirport);
+            }
+        });
+    });
+}
+
   // Load notification preference
   const savedPref = localStorage.getItem('notificationsEnabled');
   if (savedPref !== null) {
@@ -226,13 +258,14 @@ async function removeAirport(code) {
 // Load flights for airport
 async function loadFlights(airportCode) {
   try {
-    updateStatus(`Loading flights for ${airportCode}...`);
+    updateStatus(`Loading ${currentFlightType} for ${airportCode}...`);
     flightsContainer.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading flights...</p></div>';
     
-    const response = await fetch(`${API_URL}/flights/${airportCode}`);
+    const response = await fetch(`${API_URL}/flights/${airportCode}?type=${currentFlightType}`);
     const data = await response.json();
     
     if (data.success && data.flights.length > 0) {
+      allFlightsCache[currentFlightType] = data.flights;
       displayFlights(data.flights);
       updateStatus('Flights loaded');
       lastUpdateSpan.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
@@ -240,8 +273,8 @@ async function loadFlights(airportCode) {
       // Check for delays and notify
       checkForDelaysAndNotify(data.flights);
     } else {
-      flightsContainer.innerHTML = '<p class="empty-state">No flights found for this airport</p>';
-      updateStatus('No flights found');
+      flightsContainer.innerHTML = `<p class="empty-state">No ${currentFlightType} found for this airport</p>`;
+      updateStatus(`No ${currentFlightType} found`);
     }
   } catch (error) {
     console.error('Error loading flights:', error);

@@ -25,9 +25,12 @@ let monitoredAirports = [];
 app.get('/api/flights/:airportCode', async (req, res) => {
   try {
     const { airportCode } = req.params;
-    console.log(`Fetching flights for airport: ${airportCode}`);
+    const { type } = req.query; // NEW: Get type from query params
+    const flightType = type || 'departures';
     
-    const flights = await flightService.getFlights(airportCode);
+    console.log(`Fetching ${flightType} for airport: ${airportCode}`);
+    
+    const flights = await flightService.getFlights(airportCode, flightType);
     res.json({ success: true, flights });
   } catch (error) {
     console.error('Error fetching flights:', error.message);

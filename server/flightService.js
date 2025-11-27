@@ -21,14 +21,27 @@ async function getFlights(airportCode) {
       throw new Error('Please set your FLIGHT_API_KEY in the .env file');
     }
 
-    const response = await axios.get(`${BASE_URL}/flights`, {
-      params: {
-        access_key: API_KEY,
-        dep_iata: airportCode,
-        limit: 20
-      }
-    });
+    async function getFlights(airportCode, type = 'departures') {
+  try {
+    if (!API_KEY || API_KEY === 'your_api_key_here') {
+      throw new Error('Please set your FLIGHT_API_KEY in the .env file');
+    }
 
+    // Set parameter based on type
+    const params = {
+      access_key: API_KEY,
+      limit: 20
+    };
+    
+    if (type === 'departures') {
+      params.dep_iata = airportCode;
+    } else {
+      params.arr_iata = airportCode;
+    }
+
+    const response = await axios.get(`${BASE_URL}/flights`, { params });
+
+    
     if (!response.data || !response.data.data) {
       throw new Error('Invalid API response');
     }
